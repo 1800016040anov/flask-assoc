@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'layout/header.html' %}
+</head>
+<body>
+    {% include 'layout/navbar.html' %}
+    {% include 'layout/sidebar.html' %}
+
+
+<div class="container" style="padding-top: 3%;">
+    <div class="row">
+      <div class="col">
+        <form method="POST" enctype="multipart/form-data" action="/data_transaksi">
+            <input class="form-control"type="file" id="myFile" name="uploaded-file">
+          
+        </form>
+      </div>
+      <div class="col">
+        <form action="/show_data" >
+            <input class="btn btn-primary" type="submit" value="Show data" />
+        </form>
+      </div>
+    </div>
+    <div class="row">
+ 
+  </div>
+
+</body>
+</html>
