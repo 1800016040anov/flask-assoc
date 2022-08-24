@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'layout/header.html' %}
+</head>
+<body>
+    {% include 'layout/navbar.html' %}
+    {% include 'layout/sidebar.html' %}
+
+
+<div class="container" style="padding-top: 3%;">
+    <div class="row">
+      <div class="col-12">
+        <form method="POST" enctype="multipart/form-data" action="/data_transaksi_after">
+          <div class="row">
+          <div class="col">
+            <input class="form-control"type="file" id="myFile" name="uploaded-file"> 
+          </div>
+          <div class="col">
+      
+            <input class="btn btn-primary" type = "submit" value="upload"/>
+            <a type="button" class="btn btn-primary" href="/data_transaksi"> <i class="bi bi-trash"></i></a>
+            
+          </div>
+        </div>      
+        </form>
+      </div>
+      <div class="col">
+        <!-- <form action="/show_data" >
+            <input class="btn btn-primary" type="submit" value="Show data" /> -->
+        </form>
+      </div>
+    </div>
+    <div class="row">
+              <div class="col-6"> <p>{{dt}}</p></div>
+           
+          </div>
+    <div class="row">
+      <div class="col-8 table-wrapper-scroll-y my-custom-scrollbar">
+     
+        <table class="table table-bordered" id="mytable">
+    
+            <tbody id="bdy">
+              <tr>
+                <td style="text-align:center;"> {% for table in tables %}
+                    {{ table|safe }}
+                    {% endfor %}</td>
+        
+              </tr>
+            
+            </tbody>
+          </table>
+          <div class="pagination-container">
+	
+            <ul class="pagination"></ul>
+          
+      </div>
+
+
+      </div>
+      <div class="col-3">
+       
+        <table class="table table-bordered" ">
+            <tbody>
+              <tr>
+                <td style="text-align:center;"> {% for dt in dts %}
+                    {{ dt|safe }}
+                    {% endfor %}</td>
+              </tr>
+            </tbody>
+          </table>
+
+
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <p>Total Data : {{tot}}</p>
+      </div>
+      <div class="col">
+     
+      </div>
+      <div class="col">
+        <form action="/preprocessing" >
+            <input  class="btn btn-primary" type="submit" value="Preprocessing" style="float: right ;"/>
+        </form>
+      </div>
+    </div>
+
+</body>
+</html>

@@ -10,21 +10,32 @@
 
 <div class="container" style="padding-top: 3%;">
     <div class="row">
-      <div class="col">
-        <form method="POST" enctype="multipart/form-data" action="/data_transaksi">
-            <input class="form-control"type="file" id="myFile" name="uploaded-file">
-          
+      <div class="col-12">
+        <form method="POST" enctype="multipart/form-data" action="/data_transaksi_after">
+          <div class="row">
+          <div class="col">
+            <input class="form-control"type="file" id="myFile" name="uploaded-file"> 
+          </div>
+          <div class="col">
+      
+            <input class="btn btn-primary" type = "submit" value="upload"/>
+            <a type="button" class="btn btn-primary" href="/data_transaksi"> <i class="bi bi-trash"></i></a>
+            
+          </div>
+        </div>
+            <div class="row">
+              <div class="col"> <p>{{dt}}</p></div>
+        
+          </div>
+        
+            
         </form>
       </div>
-      <div class="col">
-        <form action="/show_data" >
-            <input class="btn btn-primary" type="submit" value="Show data" />
-        </form>
+      
       </div>
     </div>
-    <div class="row">
- 
-  </div>
+    
+    
 
 </body>
 </html>
