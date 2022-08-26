@@ -1,0 +1,27 @@
+
+    <!DOCTYPE html>
+<html>
+<head>
+    {% include 'layout/header.html' %}
+</head>
+<body>
+    {% include 'layout/navbar.html' %}
+    {% include 'layout/sidebar.html' %}
+
+
+<div class="container" style="padding-top: 3%;">
+
+    <!-- download Folder-->
+<div align="center">
+ 
+    
+    </ul>
+            {% for file in files %}
+        <li class="collection-item"><a href="#">{{ file }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>

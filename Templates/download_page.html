@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'layout/header.html' %}
+</head>
+<body>
+    {% include 'layout/navbar.html' %}
+    {% include 'layout/sidebar.html' %}
+
+<div class="content" style="margin-top: 3%; margin-right: 3%;">
+    <div class="jumbotron jumbotron-fluid" style="height: 30px ;">
+        <div class="container">
+           <h1>download file </h1> 
+        </div>
+    </div>
+
+    <div class="jumbotron jumbotron-fluid ">
+        <div class="container">
+            <ul class="list-group">
+                {% for file in files %}
+                <li class="list-group-item d-flex justify-content-between align-items-center"> <span><i class="bi bi-file-pdf" style="color: red ;"> </i>{{file}} </span>
+                  <span class="btn btn-primary"> <a href = {{url_for('download_page', file=file)}} ><i class="bi bi-download" style="color: white ;"></i></a></span>
+                  {% endfor %}
+                </li>
+              </ul>
+              
+        </div>
+    </div>
+</div>
+
+
+
+
+</body>
+</html>

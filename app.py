@@ -3,12 +3,40 @@ import datetime
 from dbm import dumb
 from distutils.command.upload import upload
 from distutils.log import error
-from flask import Flask, render_template, url_for, redirect,request,session
+from email import message
+from pipes import Template
+from flask import Flask, render_template, url_for, redirect,request,session,send_file,app
 import os
 from werkzeug.utils import secure_filename
 import numpy as np
 import pandas as pd
 import os
+import pdfkit
+from pathlib import Path
+import os
+
+app = Flask(__name__)
+
+
+
+
+
+path = os.path.join(os.getcwd(), 'storage')
+
+def get_files(path):
+    for file in os.listdir(path):
+        if os.path.isfile(os.path.join(path, file)):
+            yield file  
+
+
+
+kitoptions = {
+  "enable-local-file-access": None
+}
+
+
+
+
 
 app = Flask(__name__)
 
@@ -22,7 +50,7 @@ app.config['SECRET_KEY'] = 'super secret key'
 
 @app.route('/')
 def hello():
-    return render_template('index.html', utc_dt=datetime.datetime.now(datetime.timezone.utc))
+    return render_template('index.html',)
 
 @app.route('/data_transaksi', methods=['GET', 'POST'])
 def data_transaksi():
@@ -48,8 +76,6 @@ def data_transaksi():
 @app.route('/data_transaksi_after', methods=['GET', 'POST'])
 def data_transaksi_after():
     if request.method == 'POST':
-        # # upload file flask
-        # uploaded_df = request.files['uploaded-file']
 
         uploaded_df = request.files['uploaded-file']
 
@@ -66,58 +92,21 @@ def data_transaksi_after():
         data_dsc = pd.DataFrame(data_dsc)
         name_file = f"success get file :   {os.path.basename(data_file_path)}"
         session['uploaded_data_file_path'] = data_file_path
-        # # Extracting uploaded data file name
-        # data_filename = secure_filename(data_file_path.filename)
-
-        # # flask upload file to database (defined uploaded folder in static path)
-        # uploaded_df.save(os.path.join(app.config['UPLOAD_FOLDER'], data_filename))
-        # session['uploaded_data_file_path'] = os.path.join(app.config['UPLOAD_FOLDER'], data_filename)
-
-        # # Storing uploaded file path in flask session
+        
         
     return render_template('Data_Transaksi_show.html',tables=[uploaded_df.to_html(classes='data')], titles=uploaded_df.columns.values,dts=[data_dsc.to_html(classes='data')],tot = total_data ,dt = name_file)
 
 
-# @app.route('/apriori', methods=['GET', 'POST'])
-# def apriori():
-#     if request.method == 'POST':
-#         # do stuff when the form is submitted
-#         # redirect to end the POST handling
-#         # the redirect can be to the same route or somewhere else
-#         return redirect(url_for('index'))
+@app.route('/rekomendasi', methods=['GET', 'POST'])
+def rekomendasi():
+    items=[]
+    file_list = list(get_files(path))
+    for item in file_list:
+        file_ext = item.split('.')
+        if file_ext[1] in '.pdf':
+            items.append(item)
+    return render_template('download_page.html', files = items)   
 
-#     # show the form, it wasn't submitted
-#     return render_template('apriori.html')
-
-@app.route('/pengaturan', methods=['GET', 'POST'])
-def pengaturan():
-    if request.method == 'POST':
-        # do stuff when the form is submitted
-        # redirect to end the POST handling
-        # the redirect can be to the same route or somewhere else
-        return redirect(url_for('index'))
-
-    # show the form, it wasn't submitted
-    return render_template('pengaturan.html')
-
-# @app.route('/show_data')
-# def showData():
-#     # Retrieving uploaded file path from session
-#     try:
-#         data_file_path = session.get('uploaded_data_file_path', None)
-#     except:
-#         print(error)
-
-#     # read csv file in python flask (reading uploaded csv file from uploaded server location)
-#     uploaded_df = pd.read_excel(data_file_path)
-#     data_dsc =uploaded_df.isna().sum()
-#     total_data = len(uploaded_df)
-#     data_dsc = {"Data Kosong " : data_dsc}
-#     data_dsc = pd.DataFrame(data_dsc)
-
-
-
-    # return render_template('show_data.html',tables=[uploaded_df.to_html(classes='data')], titles=uploaded_df.columns.values,dts=[data_dsc.to_html(classes='data')],tot = total_data )
 
 @app.route('/preprocessing')
 def preprocessing():
@@ -142,56 +131,20 @@ def preprocessing():
     # return render_template('show_data.html', data_var = uploaded_df_html)
     return render_template('preprocessing.html',tables=[data_view.to_html(classes='data')], titles=uploaded_df.columns.values,dts=[data_dsc.to_html(classes='data')],tot = total )
 
-# @app.route('/select_column')
-# def select_column():
-#     # Retrieving uploaded file path from session
-#     data_file_path = session.get('uploaded_data_file_path', None)
-
-#     # read csv file in python flask (reading uploaded csv file from uploaded server location)
-#     uploaded_df = pd.read_excel(data_file_path)
-#     uploaded_df = uploaded_df
-#     dtvw = uploaded_df.head()
-#     return render_template('select_column.html',tables=[uploaded_df.to_html(classes='data')], titles=uploaded_df.columns.values)
-
-
-# @app.route('/select_column', methods=['POST'])
-# def group():
-#     Item = request.form['Item']
-#     Id = request.form["Id"]
-#     # data_file_path = session.get('uploaded_data_file_path', None)
-#     # uploaded_df = pd.read_excel(data_file_path)
-#     # data_cleaning = uploaded_df.dropna(subset=['No Transaksi', 'Nama Item'])
-#     # data_cleaning.reset_index(inplace=True)
-#     dict_obj = session['data_cleaning'] if 'data_cleaning' in session else ""  
-#     data_cleaning = pd.DataFrame(dict_obj)
-#     data_dsc =data_cleaning.isna().sum()
-#     data_selection = data_cleaning[[f'{Id}',f'{Item}']]
-#     data_group=data_selection.groupby(f"{Id}", as_index=False).agg({f"{Item}": lambda d: ",".join(d.astype(str))})
-#     total = len(data_group)
-#     dtvw =  data_group.head()
-#     dict_obj = data_group.to_dict('list')
-#     session['data_group'] = dict_obj
-
-#     return render_template('select_column.html',tables=[data_group.to_html(classes='data')], titles=dtvw.columns.values, tot=total)
 
 
 @app.route('/apriori')
 def apriori():
     dict_obj = session['data_view'] if 'data_group' in session else ""  
     data_view = pd.DataFrame(dict_obj)
-    # Retrieving uploaded file path from session
-    # data_file_path = session.get('uploaded_data_file_path', None)
 
-    # read csv file in python flask (reading uploaded csv file from uploaded server location)
-    # uploaded_df = pd.read_excel(data_file_path)
-    # uploaded_df = uploaded_df
-    # dtvw = data_group.head()
     return render_template('apriori.html',tables=[data_view.to_html(classes='data')], titles=data_view.columns.values)
 
 
 @app.route('/apriori', methods=['POST'])
 def apriori_refresh():
     from apyori import apriori
+    data_file_path = session.get('uploaded_data_file_path', None)
     dict_obj = session['data_group'] if 'data_group' in session else ""
     data_group = pd.DataFrame(dict_obj)
     min_support = request.form['min_support']
@@ -203,7 +156,7 @@ def apriori_refresh():
     for i in range(len(dtgr)):
         x = dtgr[i].split(",")
         records.append(x)
-    association_rules = apriori(records,min_support = sup,min_confidence = co,min_lift = 3,min_length = 2)
+    association_rules = apriori(records,min_support = sup,min_confidence = co,min_lift = 2,min_length = 2)
     association_results = list(association_rules)
     dtf = []
     for item in association_results:
@@ -213,8 +166,29 @@ def apriori_refresh():
 
         dtf.append(ds)
     result = pd.DataFrame(dtf)
-    return render_template('apriori.html', tables=[result.to_html(classes='data')], titles=result.columns.values)
+    association_rules_pdf = apriori(records,min_support = sup,min_confidence = co,min_lift = 2,min_length = 2)
+    association_results_pdf = list(association_rules_pdf)
+    dtf_pdf = []
+    for item in association_results_pdf:
+        pair = item[0]
+        items = [x for x in pair]
+        ds_pdf = {'Item1': f"{items[0]}", "Rekomendasi": f"{items[1]}", 'lift': f"{str(round(item[2][0][3], 3))}"}
 
+        dtf_pdf.append(ds_pdf)
+    result_pdf = pd.DataFrame(dtf_pdf)
+    folder = os.path.join(os.getcwd(), 'storage')
+
+    # demo_df = pd.DataFrame(np.random.random((10,3)), columns = ("col 1", "col 2", "col 3"))
+
+    nama_file = Path(f'{data_file_path}').stem
+    
+    
+    html = render_template('dataframe.html', tables=[result_pdf.to_html(classes='data')], titles=result.columns.values)
+    pdfkit.from_string(html, f'/{folder}/{nama_file}.pdf', options=kitoptions)
+
+    message = f"succesfully save pdft at {folder}"
+    
+    return render_template('apriori.html', tables=[result.to_html(classes='data')], titles=result.columns.values, mes= message)
 
 @app.route('/clr')
 def ab():
@@ -223,3 +197,9 @@ def ab():
     
     return render_template('index.html')
 
+
+@app.route('/download_page/<file>',methods=['GET', 'POST'])
+def download_page(file):
+    path_folder = os.path.join(os.getcwd(), 'storage')
+    path = f"{path_folder}/{file}"
+    return send_file(path, as_attachment=True)
