@@ -128,15 +128,19 @@ def preprocessing():
 
     dict_obj = data_group.to_dict('list')
     session['data_group'] = dict_obj
-    # return render_template('show_data.html', data_var = uploaded_df_html)
     return render_template('preprocessing.html',tables=[data_view.to_html(classes='data')], titles=uploaded_df.columns.values,dts=[data_dsc.to_html(classes='data')],tot = total )
 
 
 
 @app.route('/apriori')
 def apriori():
-    dict_obj = session['data_view'] if 'data_group' in session else ""  
-    data_view = pd.DataFrame(dict_obj)
+
+    try:
+        dict_obj = session['data_view'] if 'data_group' in session else ""  
+        data_view = pd.DataFrame(dict_obj)
+    except:
+        return render_template('apriori.html',)
+
 
     return render_template('apriori.html',tables=[data_view.to_html(classes='data')], titles=data_view.columns.values)
 
@@ -184,7 +188,7 @@ def apriori_refresh():
     
     
     html = render_template('dataframe.html', tables=[result_pdf.to_html(classes='data')], titles=result.columns.values)
-    pdfkit.from_string(html, f'/{folder}/{nama_file}.pdf', options=kitoptions)
+    pdfkit.from_string(html, f'/{folder}/{nama_file}_sup:{min_support}%_co:{min_confidence}%.pdf', options=kitoptions)
 
     message = f"succesfully save pdft at {folder}"
     
